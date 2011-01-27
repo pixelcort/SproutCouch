@@ -1,5 +1,3 @@
 /*globals SproutCouch*/
 
-SproutCouch = SC.Object.create({
-  
-});
+SproutCouch = SC.Object.create({});
