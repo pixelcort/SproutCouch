@@ -10,14 +10,18 @@ SproutCouch.DataSource = SC.DataSource.extend({
 
     SC.Request.postUrl('/'+this.database+'/_all_docs?include_docs=true')
               .json()
-              .notify(this, 'retrieveRecordsRequestDidComplete', {store: store})
+              .notify(this, 'retrieveRecordsRequestDidComplete', {
+                store: store,
+                storeKeys: storeKeys
+              })
               .send({keys: ids});
     return YES;
   },
   retrieveRecordsRequestDidComplete: function(request, params) {
     var response = request.get('response'),
         dataHashes = response.rows.map(function(row){return row.doc;});
-    params.store.loadRecords(SproutCouch.Record, dataHashes);
+    if (dataHashes.length !== params.storeKeys.length) throw SC.$error('lengths did not match');
+    params.store.loadRecords(params.storeKeys.map(function(storeKey){return params.store.recordTypeFor(storeKey);}), dataHashes);
   },
 
   commitRecords: function(store, createStoreKeys, updateStoreKeys, destroyStoreKeys, params) {
